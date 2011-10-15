@@ -1,0 +1,432 @@
+ADDON DEPENDENCIES V0.7
+
+. the addon messages and this documentation are written in a froggy english
+  flavour : any help to improve messages and docs in intl. english are welcome.
+. reading this can be tedious I know, but since some builtin files are replaced
+  it's better if you know a bit about the way it work...
+
+INTRODUCTION
+
+    this addon installs or registers nothing,  does not import any module, and
+    has no features by itself : it applies safely a patch (more exactly it 
+    safely replaces some files) in Blender that gives some more features to the
+    addon builtin mecanism.
+
+FEATURES :
+
+  . the patch can be safely enabled and disabled
+  
+        . several checks are performed to avoid chaotic situations
+          (see the TESTED CASES section)
+        . replaced files are saved in the addon folder, by revision
+          (in /user)
+        . original files are provided, grouped by revision. (/ori)
+        . if the replaced files were themselves modded and that 
+          you want to use them back when addon dependencies is disabled,
+          please see the USAGE section.
+
+  . add a light dependency feature between addons :
+
+        . an addon can declare it needs another addon to be enabled to run.
+        . in the case the other addon is not started, it will be done right
+          before it (v0.7).
+          several parents can be declared, each with their versions.
+        . a 'parent' addon can't be disabled if it's currently used by one or
+          several other addons. an addon does not need any modification
+          to become a 'parent', only the 'child' needs a particular field
+          in bl_info
+        . the mod is fully compatible with normal addons.
+        . the 'childs' addons are fully compatible with the normal version.
+        . icons and new fields are displayed when an addon is either a 'child'
+          or a 'parent' addon.
+        . creation of a 'child' addon is quick : one new field in bl_info.
+        
+  . improvements for multi-modules addon development :
+
+        . get rid of the "already registered as a subclass" message when
+          unregister() was faulty.
+        . disabling then enabling an addon will reload and reread every module
+          of the addon not only the __init__ file (similar to F8 but for only
+          one module, or like the 'add a bug to __init__/reload/correct/reload'
+          trick)
+        . support dynamically created class (e.g. generated through exec)
+          without complaining.
+        
+        to sum up, child modules of a main __init__ module are removed from
+        sys.modules when the addon is unregistered : this permits to reload/
+        disable everything with less complications. this is safe.
+
+  . addons can optionnally be disobedients :
+
+        at register() and unregister steps() an addon could decide to stay
+        active. this can be useful for cases where an addon has not finished
+        its job: it did not save a file, a modal op. is still running, he is
+        still performing a loop, or maybe the user needs to achieve something
+        before, etc..
+        to achieve this, register() and unregister() can return a simple string
+        explaining why the addon desobeys. the message will be reported in the
+        ui and in the console.
+
+  . bugged addon enabled by default are not marked enabled any longer.
+
+  . misc. goodies :
+
+        ui report and icons are used along with console to provide info about
+        the cases above. messages are displayed in various cases. 
+
+  . nerds friendly (see NERDS SWITCHES section)
+
+
+A WORKING EXAMPLE OF ADDONS USING THIS PATCH
+
+    . I'm writting a script called 'image tools', about image manipulation in
+    the image editor. it uses nconvert to crop, contrast, blur etc.
+    this addon needs a modal to draw a selection box for cropping selection :
+    rather than to write another modal function, I reuse an addon to provide
+    the modal management, so I can only maintain one generic code.
+    this second addons is called 'script events'
+    
+    image tools : 
+    http://blenderpython.svn.sourceforge.net/viewvc/blenderpython/259/scripts/addons_extern/image_tools/?view=tar
+
+    script events :
+    http://blenderpython.svn.sourceforge.net/viewvc/blenderpython/259/scripts/addons_extern/script_events/?view=tar
+
+    once installed, and if addon dependencies has patched the blender files,
+    the two scripts will be aware or their relationship, that will be displayed
+    in the user preferences > addons tab. if one enable image tools, it will
+    enable script events if it's not, or if image tools is enabled by default
+    and script event is not, it will be started either.
+
+   the connection between the two is done by adding the following field in
+   the bl_info of the image tools __init__ file :
+
+        "dependencies": "Script Events (0,4)"
+
+    nothing else. for sure the two scripts will also work with the original
+    blender files.
+
+
+PATCHABLE BLENDER VERSIONS, OSes :
+
+    . v0.6 can patch Blender 2.59 and 2.60rc (respectively r39307 and 40791)
+    . the addon has been tested on XP pro 32bits. it should be compatible
+      with linux and mac os BUT THIS IS UNTESTED SO FAR. THANKS TO REPORT.
+      * a first test was made on linux, everything looks ok.
+    . the worst case scenario is not that bad, only backup the original files
+      in a safe location if you run linux or macos (see modded files below)
+      before to run. also the addon is shipped with the 2.60rc original files.
+      (from the blender.org release zip, windows 32bit)
+    . no support for older windows OSes. I mean no warranty.
+    . blender revision check can be overriden if you know what you do. e.g. if
+      you use a graphicall build and want to force the patch
+      (see NERDS SWITCHES section)
+
+v0.6 MODDED FILES LIST :
+
+    . Blender 2.59 revision 39307 :
+        /modules/addon_utils.py
+        /startup/bl_ui/space_userpref.py
+
+    . Blender 2.60rc revision 40791 :
+        /modules/addon_utils.py
+        /startup/bl_ui/space_userpref.py
+        /startup/bl_operators/wm.py
+
+    the provided features are the same for both releases.
+
+INSTALLATION :
+
+  . unzip the addon folder in scripts/addons or addons_extern or _contrib
+  . if a previous version of addon dependencies lesser than 0.6 is installed,
+    remove the modded files and rename the original files as it should,
+    as if everything was normal.
+  . if you udgrade from 0.6 or greater, simply replace the addon_dependencies
+    folder with the new one.
+  . unzip the addon in the blender scripts/addons directory,
+  . start Blender, open the console if you want to see logs,
+  . browse to Development in the user preferences / addon tab,
+  . (or search for 'addon')
+  . enable Addon Dependencies : patch is applied,
+  . restart Blender (mandatory) : patch is now running.
+ 
+  the addon can be enabled by default or not.
+
+USAGE :
+
+  . applying patch / restoring files :
+ 
+        enable the addon to apply the patch,
+		disable the addon to restore.
+		the addon can be enabled by default
+		if you disable it and it's enabled by default,
+		'save as default again' after disabling it, else it will be reapplied
+		at next run.
+		
+		(see the other section for more technical info.)
+
+  . configure an addon as a 'child' addon :
+  
+        in the bl_info of your addon add a new field called "dependencies"
+        then add the addon names or the addon module name and the version
+        using the following format :
+            "dependencies" : 'Script Events (0,1)'
+        if you need several parents, nest them in a list :
+            "dependencies" : [ 'Script Events (0,1)', 'RotoBezier (0.8)' ]
+        the previous syntax is still ok.
+        in case of wrong syntax, the child addon can't be enabled. an error
+        message is displayed describing the error in the user preference /
+        addon field.
+
+  . create a 'disobedient' addon :
+        it can be done at the register() and/or at the unregister() steps.
+        supposing you performed some tests to see if i's ok to enable or to
+        disable your addon, and supposing the tests return it's a no go, you
+        only need to return something like :
+
+            return False
+
+        or :
+        
+            return "I'm not done yet, sorry, please do.."
+
+NERDS SWITCHES
+    
+  there's two variables in the __init__ file you can change for special use :
+  (top of the file)
+
+  . you want to force the patch to be applied in your build.
+    I won't provide patch for builds from graphicall. but if you think this
+    will work anyway, you can force a patch to be applied by setting :
+
+        fake_revision = < revision_number as string >
+
+    to the patch revision number you want to apply. a folder named as the
+    revision number must exist in /mod and a key name in the modded dict
+    must match too.
+    when you disable them the file of your build will be restored (and not
+    those shipped from the trunk)
+    a message is displayed in the console when you use this.
+    default is fake_revision = False.
+
+
+  . you already hacked files from the Blender distro, and you don't want to
+    loose them.
+        the 'not so original' files are saved in the addon /user folder.
+        as long as a file exists in the /user file, they are not updated again.
+    to restore them set :
+
+        use_user_files = True
+        
+    the console tell which files are restored. in case of missing files in
+    /user, the trunk files from /ori are restored.
+    default is False
+
+v0.6 RELEASE NOTES :
+
+. work with no warranty on obsolete windows os because I unified the path
+  separators the unix way whatever the os is. which is the right and only way
+  paths should be written anyway.
+  you'll find below the complete set of done tests achieved on blender 2.58a,
+  2.59 and 2.60rc (respectively r38019, r39307 and 40791)
+
+. v0.6 can patch Blender 2.59 and 2.60rc (respectively r39307 and 40791)
+  several checks are performed that must prevent any issues in case of
+  wrong usage.
+  
+. you can obtain more logs in the console to track register() unregister()
+  activities by setting verbose = True in the __init__ file of the addon.
+
+TESTED CASES
+tested cases were the following :
+
+  . enabling the v0.6 addon on blender 2.58a r38019 : 
+        console must say :
+
+            Addon dependencies :
+              version mismatch :
+              this addon is compatible with blender revisions 39307, 40791,
+              but you currently use blender build (2, 58, 1) revision 38019.
+     
+            the patch won't be applied.
+            patch is only applied if the right revision folder is found in the
+            addon release /mod folder AND if the __init__ file contains the
+            list of files to patch for each of these revisions
+     
+            for the v0.6 addon, blender 2.59 and blender 2.60rc are the only
+            revisions that can be patched (r39307 and 40791).
+
+            with 2.58a there's an error logged in the console but I think I'm
+            not responsible about that..? ( 2.58a check addon version code in
+            userpref ) 
+
+  . enabling the addon in 2.59 and 2.60rc (r39307 and 40791) : 
+
+        the first time, the files that will be patched are copied into :
+            addon_dependencies\user\<revision>
+        the first time the addon is enabled, console must say :
+
+            Addon dependencies :
+              blender r<revision>, patch v.0.6
+              currently using the original files
+              saved current file in user/<revision>/<file_x>
+              saved current file in user/<revision>/<file_y>
+              [...]
+              copying mod/<revision>/<file_x>
+              copying mod/<revision>/<file_y>
+              [...]
+              patch installed, please restart Blender.
+
+        and the next times :
+
+            Addon dependencies :
+              blender r<revision>, patch v.0.6
+              currently using the original files
+              copying mod/<revision>/<file_x>
+              copying mod/<revision>/<file_y>
+              [...]
+              patch installed, please restart Blender.
+
+        this has been done for the case the user is a blender files hacker
+        itself, so he can retrieve his own mods.
+
+        * if the user want to backup his files again, he first needs to remove
+        the corresponding files in addon_dependencies\user\<revision>
+
+  . disabling the addon :
+
+        console must say :
+
+            Addon dependencies :
+              blender r<revision>, patch v.0.6
+              currently using the modded files
+              copying ori/<revision>/<file_x>
+              copying ori/<revision>/<file_y>
+              [...]
+              patch removed, please restart Blender.
+
+        the original files are shipped with the addon, they are located in :
+            addon_dependencies\ori\<revision>
+
+        the original files were copied from the zipped 32 bits windows package.
+
+        * if the user want to restore his own hack, he needs to manually copy
+        his files from the addon_dependencies\user\<revision> folder to the
+        right blender folders.
+
+        * in case of unpredicted chaos, the original files can be restored by
+        hand from addon_dependencies\ori\<revision> (shipped original files)
+        or from addon_dependencies\user\<revision> (backuped original files)
+        the corresponding paths are written in the __init__ file, in the
+        corresponding modded[revision] list
+
+        * if the addon is enabled by default and that you disable it, you need
+        to 'save as default', else when restarted, the addon will reinstall the
+        patch.
+
+  . files are patched and addon dependencies is disabled by default :
+        in this case, the addon is disabled in the user preference ui.
+        when 'enabling' it, console must say :
+          
+            Addon dependencies :
+              blender r40791, patch v.0.6
+              currently using the modded files
+          
+        as the modded files are already there, it does nothing. and now the
+        addon is marked as enabled, so it's ok.
+      
+  . addon dependencies is enabled by default (so files are patched) :
+        console :
+
+            Addon dependencies :
+              blender r40791, patch v.0.6
+              currently using the modded files
+          
+        it does not copy anything.
+      
+  . evil user / ghost in the shell mixed modded and original files together :
+    (or mixed different revisions)
+
+        . addon dependencies is enabled by default (files are patched) :
+                
+            ex copied an old modded addon_utils.py in the r40791 modded build :
+                
+                Addon dependencies :
+                  blender r40791, patch v.0.6
+                  addon_utils.py modded version does not match
+                  copying mod/40791/addon_utils.py
+                  copying mod/40791/wm.py
+                  copying mod/40791/space_userpref.py
+                  patch installed, please restart Blender.
+          
+            ex2 replaced the modded wm.py by the original in the modded build :
+                
+                Addon dependencies :
+                  blender r40791, patch v.0.6
+                  original and modded files are mixed !
+                  copying mod/40791/addon_utils.py
+                  copying mod/40791/wm.py
+                  copying mod/40791/space_userpref.py
+                  patch installed, please restart Blender.
+            
+            if the addon is enabled by default and if the used files are not
+            the modded files, with the right blender revision, and the right
+            addon version, it applies the patch again, entirely.
+
+        . addon dependencies is disabled :
+
+            I can't help here.
+            but if the addon is enabled it will fix it by patching again, as
+            above.
+
+  . nerd user used the fake_revision and/or use_user_files switches
+        looks ok so far, tested with 2.59.0 and 4, enabling/disabling
+
+TO DO LIST :
+
+  . check only for the presence of a parent module, or a particular
+    submodule within it, whatever it's enabled or not.
+  . pep80-80
+  
+TECHNICALLY :
+
+  . core modifications are made in addon_utils.py.
+    the other files are modified to handle returned messages and to report
+    in the ui or displays icons.
+  . every modded file include a 'tag line' at line 20, used for file (modded
+    or original) and versions (blender and addon) recognitions. I'd rather like
+    to make a CRC test but this is not bundled in python (afaik?)
+        lnmod = (39307,(0, 6)) # the line 20 tag
+    39307 is the blender revision whith which this file is compatible
+    (0, 6) is the version of the addon and the modded files
+  . modded files are rewritten for every published official version of Blender
+    to use these files with a non supported revision is not recommended, but
+    this is not so risky, provided you have some skills in python and a good
+    "compare file" tool. steps would be :
+        . compare mod/<revision>/file_x.py with ori/<revision>/file_x.py
+        . compare ori/<revision>/file_x.py with the file you want to mod
+        . carefully move code from mod to your file, and adapt to the new
+          code.
+  . addon_utils.py includes two new functions :
+        . dependencies() at the bottom. this is called by enable() at step 2
+          if the 'dependencies' field exists in the bl_info dict. this is
+          were the 'parent enabled' and 'parent version ok' tests occur.
+        . del_modules(module_name). this one replaces any 
+          del sys.modules[module_name] call. the difference is that it will
+          also remove the 'childs' module of module_name, that will allow to
+          import everything again, and not only 'reload' them.
+  . bl_info (...)
+
+HISTORY
+
+v0.7
+    bugs corrected :
+    .a bug occured when childs and parent addons were enabled by default and
+    that the parent addon was lodad before the child(s), that seriously damaged
+    the ui.
+    . when  disabling, the ui was reporting warnings even if everything was ok.
+    improved :
+    . parent addon are enabled if they were not, at the moment they are needed:
+      enabling an addon will enable its parent if any.
+    . enabled by default parent addon now list their childs addons.
+    . bugged modules are not marked enabled any longer.
