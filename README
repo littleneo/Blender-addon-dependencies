@@ -28,7 +28,7 @@ http://blenderartists.org/forum/showthread.php?225244-addon-dependencies-v0.7-%2
 Quick setup (but you should read the README):
 
 download as zip or fork,
-copy the addon_dependencies in scripts/addons_contrib
+copy the addon_dependencies folder into scripts/addons_contrib
 start blender
 open the console for more info
 enable the addon, patch is applied
