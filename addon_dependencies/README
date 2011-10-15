@@ -5,6 +5,15 @@ ADDON DEPENDENCIES V0.7
 . reading this can be tedious I know, but since some builtin files are replaced
   it's better if you know a bit about the way it work...
 
+DOWNLOAD
+last revion (v0.71)
+https://github.com/littleneo/Blender-addon-dependencies 
+
+the tool is also available in the 
+http://blenderpython.svn.sourceforge.net/
+script collections
+
+
 INTRODUCTION
 
     this addon installs or registers nothing,  does not import any module, and
@@ -417,6 +426,12 @@ TECHNICALLY :
   . bl_info (...)
 
 HISTORY
+v0.71
+    . improved reset_all() function. solves a case when two addons enabled by
+      default are located in two different folders e.g. the child in
+      addons_contrib and the parent in addons_extern.
+      the child was not able to enable its parent since the path was not
+      already known.
 
 v0.7
     bugs corrected :
