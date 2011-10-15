@@ -110,9 +110,8 @@ A WORKING EXAMPLE OF ADDONS USING THIS PATCH
 PATCHABLE BLENDER VERSIONS, OSes :
 
     . v0.6 can patch Blender 2.59 and 2.60rc (respectively r39307 and 40791)
-    . the addon has been tested on XP pro 32bits. it should be compatible
-      with linux and mac os BUT THIS IS UNTESTED SO FAR. THANKS TO REPORT.
-      * a first test was made on linux, everything looks ok.
+    . the addon has been tested on XP pro 32bits, and first tests have been
+      made on linux and mac BUT THIS NEEDS MORE VALIDATIONS FOR THESE TWO.
     . the worst case scenario is not that bad, only backup the original files
       in a safe location if you run linux or macos (see modded files below)
       before to run. also the addon is shipped with the 2.60rc original files.
