@@ -6,7 +6,7 @@ ADDON DEPENDENCIES V0.7
   it's better if you know a bit about the way it work...
 
 DOWNLOAD
-last revion (v0.71)
+last revion (v0.72)
 https://github.com/littleneo/Blender-addon-dependencies 
 
 the tool is also available in the 
@@ -64,6 +64,19 @@ FEATURES :
         to sum up, child modules of a main __init__ module are removed from
         sys.modules when the addon is unregistered : this permits to reload/
         disable everything with less complications. this is safe.
+
+  . create a new location for 'renegade' addons :
+
+        work in progress and unofficial addons like most of the ones here,
+        (including all of mine) should not be located in script/addons or
+        scripts/addons_contrib or _extern. in fact, they should not reside
+        at all from what I understand :)
+        the patch add a new location where you can drop or devellop these
+        addons :
+
+            scripts/addons_sandbox
+
+        (see HISTORY v0.72 for more info.)
 
   . addons can optionnally be disobedients :
 
@@ -425,7 +438,51 @@ TECHNICALLY :
           import everything again, and not only 'reload' them.
   . bl_info (...)
 
+
 HISTORY
+v0.72
+    . added a new path for addons, 'scripts/addons_sandbox' :
+
+      from my comprehension about addons folders in /scripts :
+
+          RELEASE SCRIPTS, the official scripts distributed in Blender releases
+          are in the 'scripts/addons' folder
+
+          CONTRIB SCRIPTS good for testing but not official scripts yet
+          should be in the 'scripts/addons_contrib' folder
+
+          EXTERN SCRIPTS for external projects scripts
+          should be in the 'scripts/addons_extern' folder
+
+      so there's no official location for scripts that are still in development
+      and shared in some unofficial way (like from Blender Artists) and that
+      never dare to go into the process to become a contrib or release script.
+
+      the script collection we can find at blenderpython.svn.sourceforge.net
+      contains a lot of such 'renegade' scripts, and they are all located in
+      addons_extern, which is not the right place, in a long term perspective.
+  
+      meanwhile it's very confusing for 'newcoders'. even for more older ones
+      like me in fact, who are lost about addons locations and who finally
+      understand the whole process about script submissions and addon folders
+      concept, after years of misusage :
+  
+      I publish 'renegade' scripts since 3 years and tell the users to install
+      it in /scripts/addons and only understand today this location is not
+      suitable at all. but, there is no official ones. actually nobody told me
+      I was wrong : it makes me think a lot of the community still don't get it
+      about the way it is organized.
+  
+      so I added this category and the corresponding path :
+
+          COMMUNITY SCRIPTS : scripts from non Blender Foundation sources
+          for work in progress or not yet submitted addons.
+          (use these ones at your own risk)
+          should be in the 'scripts/addons_sandbox' folder
+
+    . corrected misc bug for 2.60rc version that did not display the parent
+      module in the dependencies field of an addon (user prefs > addon ui)
+
 v0.71
     . improved reset_all() function. solves a case when two addons enabled by
       default are located in two different folders e.g. the child in

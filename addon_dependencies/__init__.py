@@ -43,7 +43,7 @@ bl_info = {
     "name": "addon dependencies",
     "description": "",
     "author": "Littleneo / Jerome Mahieux",
-    "version": (0, 71),
+    "version": (0, 72),
     "blender": (2, 59, 0),
     "api": 39307,
     "location": "",

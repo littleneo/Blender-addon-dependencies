@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # <pep8 compliant>
-lnmod = (39307,(0, 71))
+lnmod = (39307,(0, 72))
 
 import bpy
 import os

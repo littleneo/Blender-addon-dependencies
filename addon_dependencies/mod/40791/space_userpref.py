@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # <pep8 compliant>
-lnmod = (40791,(0, 71))
+lnmod = (40791,(0, 72))
 
 import bpy
 from bpy.types import Header, Menu, Panel
@@ -1039,7 +1039,7 @@ class USERPREF_PT_addons(Panel):
                             for n,v in parent_list : txt += '%s v%s, '%(n,'.'.join(str(x) for x in v) )
                         else :
                             txt = msg
-                        #split.label(text=txt[:-2])
+                        split.label(text=txt[:-2])
                     if info["childs"] :
                         split = colsub.row().split(percentage=0.15)
                         split.label(text='In use by:')

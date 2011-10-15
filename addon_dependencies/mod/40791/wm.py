@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # <pep8 compliant>
-lnmod = (40791,(0, 71))
+lnmod = (40791,(0, 72))
 
 import bpy
 from bpy.types import Menu, Operator

@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # <pep8-80 compliant>
-lnmod = (40791,(0, 71))
+lnmod = (40791,(0, 72))
 
 __all__ = (
     "paths",
@@ -47,6 +47,11 @@ def paths():
     # EXTERN SCRIPTS: external projects scripts
     # if folder addons_extern/ exists, scripts in there will be loaded too
     paths += _bpy.utils.script_paths("addons_extern")
+
+    # COMMUNITY SCRIPTS : scripts from non Blender Foundation sources
+    # for wip or not yet submitted addons (use thos ones at your own risk)
+    # if folder addons_sandbox/ exists, scripts in there will be loaded too
+    paths += _bpy.utils.script_paths("addons_sandbox")
 
     return paths
 
