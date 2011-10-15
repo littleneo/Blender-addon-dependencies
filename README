@@ -1,0 +1,35 @@
+this addon installs or registers nothing,  does not import any module, and
+has no features by itself : it applies safely a patch (more exactly it 
+safely replaces some files) in Blender that gives some more features to the
+addon builtin mecanism :
+
+  . add a light dependency feature between addons
+  . improve multi-modules blender addon development
+  . improve the addon register/unregister/reload processes
+  . change a bit the user preferences / addon user interface
+  . see README for more
+
+the patch can be removed by disabling the addon.
+
+  
+Documentation :
+
+all of the info is located in addon_dependencies/README
+http://jerome.le.chat.free.fr/index.php/en/blender/scripts/addon-dependencies.html
+(outdated for now)
+
+
+Support, questions :
+
+here or at Blender Artists :
+http://blenderartists.org/forum/showthread.php?225244-addon-dependencies-v0.7-%282.59-and-2.60rc%29-now-as-an-addon
+
+
+Quick setup (but you should read the README):
+
+download as zip or fork,
+copy the addon_dependencies in scripts/addons_contrib
+start blender
+open the console for more info
+enable the addon, patch is applied
+restart blender, patch is running
