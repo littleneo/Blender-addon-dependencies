@@ -1,4 +1,4 @@
-# v0.2 (used by image_tools)
+# v0.2 (used by image_tools, addon dep.)
 
 import os
 import bpy

@@ -16,34 +16,23 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# more logs
-verbose = False
 
-## nerds switches :
-# don't change these ones below unless you know what you're doing.
-
-# (default : False)
-# in case you are a nerd and you use blender build from graphicall
-# this can help to override version check.
-# set this to the patch revision you want to install , e.g. '40791'
-# use_user_files will be forced to True to True to restore the blender build files
-# and not the orignal ones from trunk.
-fake_revision = False
-#fake_revision = '40791'
-
-# (default : False)  switch used at unregister() // disable patch time :
-# when restoring the non-patched files, copy them from the user backup and not
-# from original folder (which restore <revision> trunk files)
-# use it if you hacked some file and want to save your work.
-use_user_files = False 
-
+# CRC
+# linux
+#   2.59 r39307, patch v.0.72
+#     original :
+#        addon_utils.py    : 568c0665
+#        space_userpref.py : 59fd7165
+#     modded :
+#        addon_utils.py    : 955d7c4c
+#        space_userpref.py : be762ba6
 
 
 bl_info = {
     "name": "addon dependencies",
     "description": "",
     "author": "Littleneo / Jerome Mahieux",
-    "version": (0, 72),
+    "version": (0, 73),
     "blender": (2, 59, 0),
     "api": 39307,
     "location": "",
@@ -56,35 +45,26 @@ bl_info = {
 import os
 import shutil
 from sys import modules
+from zlib import crc32
 from addon_dependencies.fs_tools import *
-
-modded = {}
-modded['39307'] = [
-    'modules/addon_utils.py',
-    'startup/bl_ui/space_userpref.py'
- ]
-
-modded['40791'] = [
-    'modules/addon_utils.py',
-    'startup/bl_operators/wm.py',
-    'startup/bl_ui/space_userpref.py'
- ]
+from . config import *
 
 # Addon dependencies folder
 ad_path = clean(modules['addon_dependencies'].__path__[0]) + '/'
 
+
 # blender python files (/scripts)
 bp_path = clean(bpy.utils.script_paths()[0]) + '/'
-#paths = [ path, path + 'addons_contrib/' ]
-#for path in paths :
-#    if isdir(path) : break
 
 
 ## returns state and and a message
 # state is either 'ori', 'mod', 'mod mismatch', 'mismatch' or 'missing'
 def _checkstate(revision,verbose=False) :
-    if verbose : print('    checking file for r%s...'%revision)
-    for fid, mod in enumerate(modded[revision]) :
+    revision_mod = revision_mod_source(revision)
+    if verbose :
+        print('    checking file for r%s...'%revision)
+        if revision_mod != revision : print('    aliased : %s is actually used as patch source'%revision_mod)
+    for fid, mod in enumerate(modded[revision_mod]) :
         filename = mod.split('/')[-1]
         # files exist ?
         exist = isfile(bp_path + mod)
@@ -93,13 +73,17 @@ def _checkstate(revision,verbose=False) :
             return 'missing', '%s missing'%filename
         # which version of this file is running ?
         # all files are either modded or original, no mix allowed
+        fb = open(bp_path + mod,'rb')
+        crc = format( crc32(fb.read()) & 0xFFFFFFFF, '08x')
+        fb.close()
+        
         f = open(bp_path + mod)
         modline = f.readlines()[19][:-1]
         f.close()
         # this is a modded file
         if 'lnmod =' in modline :
-            if verbose : print('    modded : %s'%modline)
-            if modline == 'lnmod = (%s,%s)'%(revision, bl_info["version"]) :
+            if verbose : print('    modded : %s (crc : %s)'%(modline,crc))
+            if modline == 'lnmod = (%s,%s)'%(revision_mod, patch_version) :
                 if fid == 0 : version = 'mod'
                 elif version != 'mod' : return 'mismatch', 'original and modded files are mixed !'
             # this is a modded file from a previous version
@@ -108,11 +92,16 @@ def _checkstate(revision,verbose=False) :
 
         # else an original user file
         else :
-            if verbose : print('    original')
+            if verbose : print('    original (crc : %s)'%crc)
             if fid == 0 : version = 'ori'
             elif version != 'ori' : return 'mismatch', 'original and modded files are mixed !'
     return version, 'currently using the %s files'%('modded' if version == 'mod' else 'original')
 
+def revision_mod_source(revision) :
+    if type(modded[revision][0]) == int :
+        return str(modded[revision][0])
+    return revision
+    
 def mismatch_log() :
     compat = ''
     for rev in modded.keys() : compat += rev+', '
@@ -122,44 +111,50 @@ def mismatch_log() :
     print('  but you currently use blender v%s.%s.%s revision %s.'%(M,m,s,bpy.app.build_revision))
 
 def register() :
-    print('\naddon dependencies :')
+    print('\naddon dependencies v%s.%s :'%(bl_info['version'][0],bl_info['version'][1]))
     if fake_revision :
-        revision = fake_revision
+        revision = revision_real = fake_revision
         print('  ! faked revision switch enabled !')
     else :
-        revision = bpy.app.build_revision
+        revision_real = bpy.app.build_revision
+        revision = revision_mod_source(revision_real)
+    alias = '(alias) ' if revision_real != revision else ''
+
     # blender version check. version absolutely needs to match an available patch.
     #double check for an existing revision folder in the mod folder and for an existing key in the 'modded' dict above
     for dir in scandir(ad_path + 'mod', filemode = False) :
         # FOUND
         if revision == dir.split('/')[-1] and revision in modded.keys() :
-            print('  blender r%s, patch v.%s.%s'%(revision,bl_info['version'][0],bl_info["version"][1]))
+            print('  blender r%s, patch v.%s.%s'%(revision_real, patch_version[0], patch_version[1]))
 
-            # which file are currently used ?
-            state, log = _checkstate(revision,verbose)
+            # which files are currently used ?
+            state, log = _checkstate(revision_real,verbose)
             print('  %s'%log)
 
             # not the modded ones : install them
             if state != 'mod' :
+                revision_path_real = revision_real + '/'
                 revision_path = revision + '/'
-
+                
                 # revision backup directory
-                if isdir( ad_path + 'user/' + revision_path ) == False : 
-                    os.makedirs( ad_path  + 'user/' + revision_path)
+                if isdir( ad_path + 'user/' + revision_path_real ) == False : 
+                    os.makedirs( ad_path  + 'user/' + revision_path_real)
 
                 # backup used files if not already done
                 print('  Backing up user files :')
                 for file_path in modded[revision] :
                     filename = file_path.split('/')[-1]
-                    if isfile( ad_path + 'user/' + revision_path + filename ) == False :
-                        print('    copying %s file in user/%s'%(filename, revision))
+                    if isfile( ad_path + 'user/' + revision_path_real + filename ) == False :
+                        print('    copying %s file in user/%s'%(filename, revision_real))
                         if verbose :
                             print('      from : ' + bp_path + file_path )
-                            print('      to   : ' + ad_path + 'user/' + revision_path + filename )
-                        shutil.copy2( bp_path + file_path , ad_path + 'user/' + revision_path + filename )
-
+                            print('      to   : ' + ad_path + 'user/' + revision_path_real + filename )
+                        shutil.copy2( bp_path + file_path , ad_path + 'user/' + revision_path_real + filename )
+                    else :
+                        print('    %s already exists in user/%s'%(filename, revision_real))
+                
                 # copy modded files
-                print('  Patching :')
+                print('  Patching %s:'%alias)
                 for file_path in modded[revision] :
                     filename = file_path.split('/')[-1]
                     print('    copying patch from mod/%s/%s'%(revision, filename))
@@ -174,28 +169,31 @@ def register() :
         mismatch_log()
 
 def unregister() :
-    print('\naddon dependencies :')
+    print('\naddon dependencies v%s.%s :'%(bl_info['version'][0],bl_info['version'][1]))
     global use_user_files
     if fake_revision :
-        revision = fake_revision
+        revision = revision_real = fake_revision
         use_user_files = True
         print('  ! faked revision switch enabled !')
     else :
-        revision = bpy.app.build_revision
+        revision_real = bpy.app.build_revision
+        revision = revision_mod_source(revision_real)
+    alias = '(alias) ' if revision_real != revision else ''
 
     # blender version check. version absolutely needs to match an available patch.
     #double check for an existing revision folder in the mod folder and for an existing key in the 'modded' dict above
     for dir in scandir(ad_path + 'mod', filemode = False) :
         # FOUND
         if revision == dir.split('/')[-1] and revision in modded.keys() :
-            print('  blender r%s, patch v.%s.%s'%(revision,bl_info['version'][0],bl_info["version"][1]))
+            print('  blender r%s, patch v.%s.%s'%(revision_real,patch_version[0],patch_version[1]))
 
             # which file are currently used ?
-            state, log = _checkstate(revision,verbose)
+            state, log = _checkstate(revision_real,verbose)
             print('  %s'%log)
 
             # not the original ones : install them
             if state != 'ori' :
+                revision_path_real = revision_real + '/'
                 revision_path = revision + '/'
 
                 # restore previously backuped user files switch is on
@@ -203,16 +201,16 @@ def unregister() :
                 if use_user_files :
                     print('  Restore from the user backup folder :')
                     # revision backup directory does not exist, abort
-                    if isdir( ad_path + 'user/' + revision_path ) == False : 
+                    if isdir( ad_path + 'user/' + revision_path_real ) == False : 
                         use_user_files = False
-                        print("    can't restore user files, revision folder %s is missing in /user"%(revision) )
+                        print("    can't restore user files, revision folder %s is missing in /user"%(revision_real) )
                     else :
 
                         # some file are missing in user/revision, abort
                         for file_path in modded[revision] :
                             filename = file_path.split('/')[-1]
-                            if isfile(  ad_path + 'user/' + revision_path + filename ) == False :
-                                print("    can't restore user files, file %s is missing in /user/%s"%(filename,revision) )
+                            if isfile(  ad_path + 'user/' + revision_path_real + filename ) == False :
+                                print("    can't restore user files, file %s is missing in /user/%s"%(filename,revision_real) )
                                 use_user_files = False
                                 break
                                 
@@ -220,16 +218,16 @@ def unregister() :
                         else :
                             for file_path in modded[revision] :
                                 filename = file_path.split('/')[-1]
-                                print('    restoring user/%s/%s'%(revision,filename) )
+                                print('    restoring user/%s/%s'%(revision_real,filename) )
                                 if verbose :
-                                    print('      from : ' + ad_path + 'user/' + revision_path + filename )
+                                    print('      from : ' + ad_path + 'user/' + revision_path_real + filename )
                                     print('      to   : ' + bp_path + file_path )
-                                shutil.copy2( ad_path + 'user/' + revision_path + filename, bp_path + file_path )
-                                os.remove( ad_path + 'user/' + revision_path + filename )
+                                shutil.copy2( ad_path + 'user/' + revision_path_real + filename, bp_path + file_path )
+                                os.remove( ad_path + 'user/' + revision_path_real + filename )
                                 
-                # restore original shipped files
+                # restore original shipped files (or fall back when user mode failed)
                 if use_user_files == False :
-                    print('  Restore from the original folder :')
+                    print('  Restore from the original folder %s:'%alias)
                     for file_path in modded[revision] :
                         filename = file_path.split('/')[-1]
                         print('    restoring ori/%s/%s'%(revision,filename) )

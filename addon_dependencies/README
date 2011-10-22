@@ -1,4 +1,5 @@
 ADDON DEPENDENCIES V0.7
+updated 22 oct. 2011
 
 . the addon messages and this documentation are written in a froggy english
   flavour : any help to improve messages and docs in intl. english are welcome.
@@ -6,7 +7,7 @@ ADDON DEPENDENCIES V0.7
   it's better if you know a bit about the way it work...
 
 DOWNLOAD
-last revion (v0.72)
+last revion (v0.73)
 https://github.com/littleneo/Blender-addon-dependencies 
 
 the tool is also available in the 
@@ -440,6 +441,19 @@ TECHNICALLY :
 
 
 HISTORY
+v0.73 22/10/11
+    . 2.60-proof (no changes since rc1)
+    . addon version (bl_info) now different from patch version (patch_version)
+      plan to only push the patched files and not the addon/patcher in next
+      releases.
+    . new config file, that contains the patch related values, will be pushed
+      with every new patches.
+    . added a crc info about files, not used, did not test on every platform
+      yet (verbose = True)
+    . added an alias option : when there's no significant changes between two
+      revisions, the same patch can be shared between them. files will
+      continue to be backupped in the real revision folder.
+    
 v0.72
     . added a new path for addons, 'scripts/addons_sandbox' :
 
