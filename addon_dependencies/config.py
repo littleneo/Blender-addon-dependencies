@@ -33,15 +33,18 @@ modded['39307'] = [
     'startup/bl_ui/space_userpref.py'
  ]
 
-# blender 2.60 and previous
+# blender 2.60
 # switched userprefs addon op. in wm
 # changes in 260 were about typos in comments, so aliased to rc1
-# 40791 should work with [40792:41097] revisions
-# bundled trunk files are linux 41098
+# 40791 should work with [40792:41226] revisions
+# bundled trunk files are linux 41098 (2.60)
+# 2.60rc1
 modded['40791'] = [
     'modules/addon_utils.py',
     'startup/bl_operators/wm.py',
     'startup/bl_ui/space_userpref.py'
  ]
-modded['41098'] = [ 40791 ]
-#modded['41097'] = [ 41098 ]
+modded['41098'] = [ 40791 ] # 2.60
+modded['41226'] = [ 40791 ] # 2.60a
+
+# last updated 1st november 2011 (2.60a support)

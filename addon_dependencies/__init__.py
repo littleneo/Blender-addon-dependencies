@@ -32,7 +32,7 @@ bl_info = {
     "name": "addon dependencies",
     "description": "",
     "author": "Littleneo / Jerome Mahieux",
-    "version": (0, 73),
+    "version": (0, 74),
     "blender": (2, 59, 0),
     "api": 39307,
     "location": "",
@@ -98,7 +98,7 @@ def _checkstate(revision,verbose=False) :
     return version, 'currently using the %s files'%('modded' if version == 'mod' else 'original')
 
 def revision_mod_source(revision) :
-    if type(modded[revision][0]) == int :
+    if revision in modded and type(modded[revision][0]) == int :
         return str(modded[revision][0])
     return revision
     

@@ -1,5 +1,5 @@
 ADDON DEPENDENCIES V0.7
-updated 22 oct. 2011
+updated 1st nov. 2011
 
 . the addon messages and this documentation are written in a froggy english
   flavour : any help to improve messages and docs in intl. english are welcome.
@@ -7,7 +7,7 @@ updated 22 oct. 2011
   it's better if you know a bit about the way it work...
 
 DOWNLOAD
-last revion (v0.73)
+last revion (v0.74)
 https://github.com/littleneo/Blender-addon-dependencies 
 
 the tool is also available in the 
@@ -441,6 +441,10 @@ TECHNICALLY :
 
 
 HISTORY
+v0.74 01/11/11
+    . corrected a bug when modded key does not exist
+    . checked patch v0.72 with 2.60a and updated to support it
+    
 v0.73 22/10/11
     . 2.60-proof (no changes since rc1)
     . addon version (bl_info) now different from patch version (patch_version)
