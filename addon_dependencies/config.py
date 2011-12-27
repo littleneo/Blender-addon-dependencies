@@ -47,4 +47,9 @@ modded['40791'] = [
 modded['41098'] = [ 40791 ] # 2.60
 modded['41226'] = [ 40791 ] # 2.60a
 
-# last updated 1st november 2011 (2.60a support)
+# blender 2.61
+modded['42615'] = [
+    'modules/addon_utils.py',
+    'startup/bl_operators/wm.py',
+    'startup/bl_ui/space_userpref.py'
+ ]

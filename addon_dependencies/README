@@ -441,6 +441,9 @@ TECHNICALLY :
 
 
 HISTORY
+v0.74 27/12/11
+    . created patch v0.72 for 2.61
+
 v0.74 01/11/11
     . corrected a bug when modded key does not exist
     . checked patch v0.72 with 2.60a and updated to support it
