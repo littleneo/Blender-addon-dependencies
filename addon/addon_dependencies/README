@@ -144,22 +144,13 @@ PATCHABLE BLENDER VERSIONS, OSes :
       you use a graphicall build and want to force the patch
       (see NERDS SWITCHES section)
 
-v0.6 MODDED FILES LIST :
+MODDED FILES LIST :
 
-    . Blender 2.59 revision 39307 :
-        /modules/addon_utils.py
-        /startup/bl_ui/space_userpref.py
-
-    . Blender 2.60rc revision 40791 :
-        /modules/addon_utils.py
-        /startup/bl_ui/space_userpref.py
-        /startup/bl_operators/wm.py
-
-    the provided features are the same for both releases.
+    see the config.py file or the /mod/<blender-revision> folder
 
 INSTALLATION :
 
-  . unzip the addon folder in scripts/addons or addons_extern or _contrib
+  . unzip the addon folder in scripts/addons or addons_extern or addons_contrib
   . if a previous version of addon dependencies lesser than 0.6 is installed,
     remove the modded files and rename the original files as it should,
     as if everything was normal.
@@ -173,6 +164,7 @@ INSTALLATION :
   . restart Blender (mandatory) : patch is now running.
  
   the addon can be enabled by default or not.
+  disabling the addon will restore the previous file
 
 USAGE :
 
@@ -193,7 +185,7 @@ USAGE :
         then add the addon names or the addon module name and the version
         using the following format :
             "dependencies" : 'Script Events (0,1)'
-        if you need several parents, nest them in a list :
+        if you need several  parents, nest them in a list :
             "dependencies" : [ 'Script Events (0,1)', 'RotoBezier (0.8)' ]
         the previous syntax is still ok.
         in case of wrong syntax, the child addon can't be enabled. an error
