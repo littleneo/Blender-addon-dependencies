@@ -10,16 +10,17 @@ verbose = False
 # don't change these ones below unless you know what you're doing.
 # see README
 
-# (default : False)
+# fake_revision (default : False)
 # in case you are a nerd and you use blender build from graphicall
 # this can help to override version check.
 # set this to the patch revision you want to install , e.g. '40791'
-# use_user_files will be forced to True to restore the blender build files
-# and not the orignal ones from trunk.
+# use_user_files will be forced to True to restore the blender build files,
+# not the original ones from trunk.
 fake_revision = False
 #fake_revision = '101'
 
-# (default : False)  switch used at unregister(), "remove patch" time :
+# use_user_files(default : False)
+# switch used at unregister(), "remove patch" time :
 # when restoring the non-patched files, copy them from the user backup and not
 # from original folder (which restore <revision> trunk files)
 # use it if you hacked some file and want to restore your own mod.
@@ -49,6 +50,13 @@ modded['41226'] = [ 40791 ] # 2.60a
 
 # blender 2.61
 modded['42615'] = [
+    'modules/addon_utils.py',
+    'startup/bl_operators/wm.py',
+    'startup/bl_ui/space_userpref.py'
+ ]
+ 
+ # blender 2.63a
+modded['46461-46487M'] = [
     'modules/addon_utils.py',
     'startup/bl_operators/wm.py',
     'startup/bl_ui/space_userpref.py'

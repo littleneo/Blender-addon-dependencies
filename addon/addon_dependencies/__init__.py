@@ -30,15 +30,15 @@
 
 bl_info = {
     "name": "addon dependencies",
-    "description": "",
+    "description": "reload wip multi-file addons without restarting, relationship check for addon... see wiki",
     "author": "Littleneo / Jerome Mahieux",
-    "version": (0, 74),
-    "blender": (2, 59, 0),
+    "version": (0, 75),
+    "blender": (2, 63, 1),
     "api": 39307,
     "location": "",
-    "warning": "",
-    "wiki_url": "",
-    "tracker_url": "",
+    "warning": "only handy for python addon programming",
+    "wiki_url": "https://github.com/littleneo/Blender-addon-dependencies/blob/master/addon/addon_dependencies/README",
+    "tracker_url": "https://github.com/littleneo/Blender-addon-dependencies/issues",
     "category": "Development"
 }
 
@@ -83,7 +83,7 @@ def _checkstate(revision,verbose=False) :
         # this is a modded file
         if 'lnmod =' in modline :
             if verbose : print('    modded : %s (crc : %s)'%(modline,crc))
-            if modline == 'lnmod = (%s,%s)'%(revision_mod, patch_version) :
+            if modline == 'lnmod = (%s,%s)'%(revision_mod, patch_version) or modline == "lnmod = ('%s',%s)"%(revision_mod, patch_version) :
                 if fid == 0 : version = 'mod'
                 elif version != 'mod' : return 'mismatch', 'original and modded files are mixed !'
             # this is a modded file from a previous version
@@ -117,11 +117,14 @@ def register() :
         print('  ! faked revision switch enabled !')
     else :
         revision_real = bpy.app.build_revision
+        if type(revision_real) == bytes :
+            revision_real = revision_real.decode()
+        revision_real = revision_real.replace(':','-')
         revision = revision_mod_source(revision_real)
     alias = '(alias) ' if revision_real != revision else ''
 
     # blender version check. version absolutely needs to match an available patch.
-    #double check for an existing revision folder in the mod folder and for an existing key in the 'modded' dict above
+    # double check for an existing revision folder in the mod folder and for an existing key in the 'modded' dict above
     for dir in scandir(ad_path + 'mod', filemode = False) :
         # FOUND
         if revision == dir.split('/')[-1] and revision in modded.keys() :

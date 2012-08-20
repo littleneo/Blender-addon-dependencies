@@ -1,5 +1,5 @@
 ADDON DEPENDENCIES V0.7
-updated 1st nov. 2011
+updated 20 aug. 2012
 
 . the addon messages and this documentation are written in a froggy english
   flavour : any help to improve messages and docs in intl. english are welcome.
@@ -7,7 +7,7 @@ updated 1st nov. 2011
   it's better if you know a bit about the way it work...
 
 DOWNLOAD
-last revion (v0.74)
+last revion (v0.75)
 https://github.com/littleneo/Blender-addon-dependencies 
 
 the tool is also available in the 
@@ -441,6 +441,11 @@ TECHNICALLY :
 
 
 HISTORY
+v0.75 27/12/11
+    . addon panel cosmetics (wiki, tracker links, description)
+    . modified revision_real since bpy.app.build_revision now given in bytes
+    . created patch v0.72 for 2.63a
+
 v0.74 27/12/11
     . created patch v0.72 for 2.61
 
@@ -456,7 +461,7 @@ v0.73 22/10/11
     . new config file, that contains the patch related values, will be pushed
       with every new patches.
     . added a crc info about files, not used, did not test on every platform
-      yet (verbose = True)
+      yet (set verbose to True in config.py)
     . added an alias option : when there's no significant changes between two
       revisions, the same patch can be shared between them. files will
       continue to be backupped in the real revision folder.
